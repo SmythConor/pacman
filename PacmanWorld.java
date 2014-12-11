@@ -56,11 +56,11 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Set up image support */
 	String SUPPORT_DIR = "images";
-	String IMG_PACMAN = SUPPORT_DIR + "pacman.jpg";
-	String IMG_RED_GHOST = SUPPORT_DIR + "redghost.png";
-	String IMG_BLUE_GHOST = SUPPORT_DIR + "blueghost.gif";
-	String IMG_YELLOW_GHOST = SUPPORT_DIR + "yellieghost.png";
-	String IMG_GREEN_GHOST = SUPPORT_DIR + "greenghost.png";
+	String IMG_PACMAN = SUPPORT_DIR + "/pacman.jpg";
+	String IMG_RED_GHOST = SUPPORT_DIR + "/redghost.png";
+	String IMG_BLUE_GHOST = SUPPORT_DIR + "/blueghost.gif";
+	String IMG_YELLOW_GHOST = SUPPORT_DIR + "/yellieghost.png";
+	String IMG_GREEN_GHOST = SUPPORT_DIR + "/greenghost.png";
 
 
 	//transient - don't serialise these:
@@ -149,7 +149,7 @@ public class PacmanWorld extends AbstractWorld {
 					greenGhostStream	= getClass().getResourceAsStream(IMG_GREEN_GHOST);
 
 
-					pacmanImg = javax.imageio.ImageIO.read(pacmanStream);
+					pacmanImg = javax.imageio.ImageIO.read(pacmanStream); ////////////////////////////
 					//caughtImg	= javax.imageio.ImageIO.read(caughtStream);
 
 					redGhostImg = javax.imageio.ImageIO.read(redGhostStream);
@@ -176,7 +176,7 @@ public class PacmanWorld extends AbstractWorld {
 				//img.createGraphics().drawImage(caughtImg,(imgwidth*catPosition.x),(imgheight*catPosition.y),null);
 			//} else {
 				//Otherwise just display the cat and mouse images
-				img.createGraphics().drawImage(pacmanImg,(imgwidth*pacmanPosition.x),(imgheight*pacmanPosition.y),null);
+				//img.createGraphics().drawImage(pacmanImg,(imgwidth*pacmanPosition.x),(imgheight*pacmanPosition.y),null);
 
 				img.createGraphics().drawImage(redGhostImg,(imgwidth*redGhost.x),(imgheight*redGhost.y),null);
 				img.createGraphics().drawImage(blueGhostImg,(imgwidth*blueGhost.x),(imgheight*blueGhost.y),null);
