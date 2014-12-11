@@ -22,7 +22,14 @@ import org.w2mind.net.*;
 //your own 2-dimensional worlds.
 
 public class PacmanWorld extends AbstractWorld {
+	/* Dimensions of the grid */
 	public static final int GRID_SIZE = 20;		//The dimensions of the grid in 2 dimensions
+
+	/* Grid boundaries */
+	public static final int TOP = 1;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 19;
+	public static final int BOTTOM = 19;
 
 	/* Pacman position */
 	protected Point pacmanPosition;
@@ -33,11 +40,14 @@ public class PacmanWorld extends AbstractWorld {
 	protected Point yellowGhost;
 	protected Point greenGhost;
 
-	protected static final int MAX_STEPS = 20;	//The maximum number of steps in a run.
+	/* Number of steps to run */
+	protected static final int MAX_STEPS = 20;
 
-	protected int caught;		//The number of times the mouse was caught
-	/* Don't think I need this */
-	//protected int numTimesMouseCaughtByCat;		//The number of times the mouse was caught by a cat move
+	/* Number of lives */
+	protected static final int NO_LIVES = 3;
+
+	/* Number of times caught */
+	protected int caught;
 
 	List<String> scoreColumnNames;			//Headers for the score fields
 
@@ -49,10 +59,6 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int ACTION_UP	= 2;
 	public static final int ACTION_DOWN	= 3;
 	public static final int NO_ACTIONS = 4;
-	/* Don't think I need this */
-	//public static final int STAY_STILL = 4;
-	//public static final int NO_ACTIONS = 5;
-
 
 	/* Set up image support */
 	String SUPPORT_DIR = "images";
@@ -98,10 +104,10 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Initialise pacman and ghost positions on the grid */
 	protected void initPos() {
-		redGhost = new Point(1,1);
-		blueGhost = new Point(19,1);
-		yellowGhost = new Point(1,19);
-		greenGhost = new Point(19,19);
+		redGhost = new Point(TOP + 1, LEFT + 1); // 2,2
+		yellowGhost = new Point(RIGHT - 1, TOP); //18,2
+		blueGhost = new Point(BOTTOM - 1, LEFT + 1); //2,18
+		greenGhost = new Point(RIGHT - 1, BOTTOM - 1); //18,18
 	}
 
 	/* Generate a random action */
