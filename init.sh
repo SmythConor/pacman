@@ -1,1 +1,1 @@
-java -cp "*" org.w2mind.toolkit.Main -mind ImageMind -world ImageWorld -g
+java -cp "*" org.w2mind.toolkit.Main -mind PacmanMind -world PacmanWorld -g

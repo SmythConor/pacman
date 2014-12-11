@@ -1,1 +1,1 @@
-rm *.class ImageMind.jar ImageWorld.jar
+rm *.class PacmanMind.jar PacmanWorld.jar
