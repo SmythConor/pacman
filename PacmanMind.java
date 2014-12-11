@@ -1,11 +1,11 @@
-//A Mind for ImageWorld
-//This mind implements the logic for the cat in ImageWorld
+//A Mind for PacmanWorld
+//This mind implements the logic for the cat in PacmanWorld
 import java.util.*;
 import java.awt.Point;
 import org.w2mind.net.*;
 
 
-public class ImageMind implements Mind {
+public class PacmanMind implements Mind {
 	//====== Mind must respond to these methods: ==========================================================
 	//  newrun(), endrun()
 	//  getaction()
@@ -59,10 +59,10 @@ public class ImageMind implements Mind {
 			//Now decide which way to move
 			if(distanceX < 0) {
 				//mouse is to the right of cat
-				action = ImageWorld.ACTION_RIGHT;
+				action = PacmanWorld.ACTION_RIGHT;
 			} else {
 				//mouse is to the left or in line of cat
-				action = ImageWorld.ACTION_LEFT;
+				action = PacmanWorld.ACTION_LEFT;
 			}
 		} else {
 			//We move in the y direction
@@ -70,10 +70,10 @@ public class ImageMind implements Mind {
 			//Now decide which way to move
 			if(distanceY < 0) {
 				//mouse is below cat
-				action = ImageWorld.ACTION_DOWN;
+				action = PacmanWorld.ACTION_DOWN;
 			} else {
 				//mouse is to the left or in line of cat
-				action = ImageWorld.ACTION_UP;
+				action = PacmanWorld.ACTION_UP;
 			}
 		}
 

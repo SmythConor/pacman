@@ -21,7 +21,7 @@ import org.w2mind.net.*;
 //The aim of this code is to give you a basis on which to build
 //your own 2-dimensional worlds.
 
-public class ImageWorld extends AbstractWorld {
+public class PacmanWorld extends AbstractWorld {
 	public static final int GRID_SIZE = 20;		//The dimensions of the grid in 2 dimensions
 
 	/* Pacman position */
