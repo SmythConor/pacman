@@ -9,10 +9,22 @@ public class PacmanMind implements Mind {
 	 *	newrun(), endrun(), getactions()
 	 */
 
+	/**
+	* Mind must respond to this method
+	* @return Nothing.
+	*/
 	public void newrun()  throws RunError {}
 
+	/**
+	* Mind must respond to this method
+	* @return Nothing.
+	*/
 	public void endrun()  throws RunError {}
 
+	/**
+	* Get an action from the world and respond to it
+	* @return Action This returns an action to the World
+	*/
 	public Action getaction(State state) {
 		/* Parse the state sent to this mind from the world */
 		String s = state.toString();
@@ -22,18 +34,10 @@ public class PacmanMind implements Mind {
 
 		Point[] ghosts = new Point[4];
 
-		//Point redGhostPosition = new Point();
-		//Point blueGhostPosition = new Point();
-		//Point yellowGhostPosition = new Point();
-		//Point greenGhostPosition = new Point();
-
 		int x = Integer.parseInt(ss[0]);
 		int y = Integer.parseInt(ss[1]);
 
 		pacmanPosition = new Point(x,y);
-
-		//pacmanPosition.x = Integer.parseInt(x[0]);
-		//pacmanPosition.y = Integer.parseInt(x[1]);
 
 		int k = 2;
 		for(int i = 0; i < 4; i++) {
@@ -44,26 +48,8 @@ public class PacmanMind implements Mind {
 			ghosts[i] = new Point(x,y);
 		}
 
-		//redGhostPosition.x = Integer.parseInt(x[2]);
-		//redGhostPosition.y = Integer.parseInt(x[3]);
-
-		//blueGhostPosition.x = Integer.parseInt(x[4]);
-		//blueGhostPosition.y = Integer.parseInt(x[5]);
-
-		//yellowGhostPosition.x = Integer.parseInt(x[6]);
-		//yellowGhostPosition.y = Integer.parseInt(x[7]);
-
-		//greenGhostPosition.x = Integer.parseInt(x[8]);
-		//greenGhostPosition.y = Integer.parseInt(x[9]);
-
-
-		// Generate non-random action.
-		// This ignores wraparound.
-		// You could easily make a better Mind that uses wraparound.
-
 		int action = 5;
 
-		//Get the distance squared in the x and y directions
 		int[] distances = new int[4];
 		int iter = 0;
 		for(int i = 0; i < 4; i++) {
@@ -99,15 +85,15 @@ public class PacmanMind implements Mind {
 			}
 		}
 
-		//Return Action as simply one field, but you could potentially provide extra fields
+		/* Format the string to send back to world */
 		String a = String.format("%d,%d", action, nearest);
 
 		return new Action(a);
 	}
 
 	/**
-	 * 0  -1     -2   -3 
-	 * red-yellow-blue-green
+	 * This method gets the index of the smallest value in an int array
+	 * @return int This returns the index of the smallest value in x
 	 */
 	private int indexOfSmallest(int[] x) {
 		int small = 100;

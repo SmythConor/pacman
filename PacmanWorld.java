@@ -1,3 +1,9 @@
+/** @author Conor Smyth 12452382
+ *  @since 01/12/2014
+ *  
+ * <p>Simple Pacman</p>
+ */
+
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
@@ -62,9 +68,11 @@ public class PacmanWorld extends AbstractWorld {
 	/* Number of times caught */
 	protected int caught;
 
-	List<String> scoreColumnNames;			//Headers for the score fields
+	/* Headers for the score fields */
+	List<String> scoreColumnNames;
 
-	protected int timeStep;				//The current time step of the simulation
+	/* Keep track of time step */
+	protected int timeStep;
 
 	//List of possible actions performed
 	public static final int ACTION_LEFT	= 0;
@@ -110,14 +118,20 @@ public class PacmanWorld extends AbstractWorld {
 	int imgwidth;
 	int imgheight;
 
-	/* Return a random position on the grid */
+	/**
+	* This method generates a random point.
+	* @return Point This returns a new point inside the grid.
+	*/
 	protected Point randomPosition() {
 		Random r = new Random();
 
 		return new Point(r.nextInt(GRID_SIZE),r.nextInt(GRID_SIZE));
 	}
 
-	/* Initialise pacman and ghost positions on the grid */
+	/** 
+	* Initialise pacman and ghost positions on the grid.
+	* @return Nothing.
+	*/
 	protected void initPos() {
 		/* Pacman in the middle */
 		pacman = new Point(11,11);
@@ -156,19 +170,30 @@ public class PacmanWorld extends AbstractWorld {
 
 	}
 
-	/* Generate a random action */
+	/**
+	* Generate a random action.
+	* @return int This returns random action.
+	*/
 	private int randomAction() {
 		Random r = new Random();
 
 		return (r.nextInt(NO_ACTIONS));
 	}
 
-	/* Check is any position going over the boudaries */
+	/** 
+	* Check is any position going over the boudaries.
+	* @param pos This is the position of an object.
+	* @return boolean This returns whether an object has crossed a boundary.
+	*/
 	boolean boundaryCheck(double pos) {
 		return (pos == TOP || pos == BOTTOM || pos == LEFT || pos == RIGHT);
 	}
 
-	/* Move from position */
+	/** 
+	* Move from position.
+	* @param startPos First parameter position.
+	* @return Nothing.
+	*/
 	private void move(Point startPos, int direction) {
 		if(direction == ACTION_LEFT)	{
 			if(boundaryCheck((startPos.x - 1))) {
@@ -197,12 +222,18 @@ public class PacmanWorld extends AbstractWorld {
 		}
 	}
 
-	/* Check if run finished */
+	/**
+	 * Check if run finished.
+	 * @return boolean This returns true if time is up.
+	 */
 	private boolean runFinished() {
 		return timeStep >= MAX_STEPS;
 	}
 
-	/* Set up buffer to hold images from disk */
+	/**
+	 * Set up buffer to hold images from disk .
+	 * @return Nothing.
+	 */
 	private void initImages()	{
 		if(imagesDesired) {
 			/* reinitialise the buffer */
@@ -238,7 +269,10 @@ public class PacmanWorld extends AbstractWorld {
 		}
 	}
 
-	/* add image to buffer */
+	/**
+	* Add image to buffer.
+	* @return Nothing.
+	*/
 	private void addImage() {
 		if(imagesDesired) {
 			BufferedImage img = new BufferedImage((imgwidth*GRID_SIZE),(imgheight*GRID_SIZE),BufferedImage.TYPE_INT_RGB);
@@ -266,7 +300,12 @@ public class PacmanWorld extends AbstractWorld {
 	 * getscore(), getimage()
 	 */
 
-
+	/**
+	* Start a new run.
+	* @return Nothing.
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public void newrun() throws RunError {
 		/* Create points to hold positions */
 		pacman = new Point();
@@ -278,7 +317,7 @@ public class PacmanWorld extends AbstractWorld {
 		//Reset everything
 		timeStep = 0;
 		caught = 0;
-		
+
 		/* Initialise the postitions of everything */
 		initPos();
 
@@ -287,6 +326,12 @@ public class PacmanWorld extends AbstractWorld {
 		scoreColumnNames.add("Caught");
 	}
 
+	/**
+	* World must respond to this method.
+	* @return Nothing.
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public void endrun() throws RunError {}
 
 	//====== Definition of state: ===========================================================================
@@ -304,6 +349,10 @@ public class PacmanWorld extends AbstractWorld {
 	//   state s = "cx,cy,mx,my" (position of cat and mouse)
 	//======================================================================================================
 
+	/**
+	* Formats the positions as a string
+	* @return String This returns the positions as a string
+	*/
 	private String positionsAsString() {
 		String x = String.format("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 				pacman.x, pacman.y,
@@ -313,8 +362,12 @@ public class PacmanWorld extends AbstractWorld {
 		return x;
 	}
 
-
-	/* Returns the state of the world */
+	/**
+	* Returns the state of the world.
+	* @return State This returns the state
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public State getstate() throws RunError {
 		String x = positionsAsString();
 
@@ -346,6 +399,10 @@ public class PacmanWorld extends AbstractWorld {
 	//  action a = "i,w1,w2,...,wn"
 	//=========================================================================================================
 
+	/**
+	* Move the ghosts
+	* @return Nothing.
+	*/
 	private void moveGhosts() {
 		move(redGhost, randomAction());
 		move(yellowGhost, randomAction());
@@ -353,6 +410,10 @@ public class PacmanWorld extends AbstractWorld {
 		move(greenGhost, randomAction());
 	}
 
+	/**
+	* Checks whether a ghost is caught and repositions if true
+	* @return Nothing.
+	*/
 	private void checkCaught() {
 		if(pacman.equals(redGhost)) {
 			caught++;
@@ -369,7 +430,12 @@ public class PacmanWorld extends AbstractWorld {
 		}
 	}
 
-	//Take the action specified
+	/**
+	* Take the action given by Mind.
+	* @return State This returns the state of the world
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public State takeaction(Action action) throws RunError {
 		/* Initialise the images */
 		initImages();
@@ -401,7 +467,7 @@ public class PacmanWorld extends AbstractWorld {
 
 		/* Move onto the next step */
 		timeStep++;
-		
+
 		/* Check if the run is finished */
 		if(runFinished()) {
 			addImage();
@@ -426,7 +492,12 @@ public class PacmanWorld extends AbstractWorld {
 	//  s2 = number of times mouse was caught due to cat's action (secondary score, larger is better)
 	//==========================================================================================================================
 
-	/* Return the score */
+	/** 
+	* Return the score.
+	* @return Score This is the score of the game.
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public Score getscore() throws RunError {
 		String s = String.format ("%d", caught);
 
@@ -436,7 +507,12 @@ public class PacmanWorld extends AbstractWorld {
 		return new Score(s, runFinished(), scoreColumnNames, values);
 	}
 
-	/* Return images of World */
+	/** 
+	* Return images of World.
+	* @return Nothing.
+	* @exception RunError On run error.
+	* @see RunError
+	*/
 	public ArrayList<BufferedImage> getimage() throws RunError {
 		return buffer;
 	}
