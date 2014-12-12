@@ -18,6 +18,10 @@ import org.w2mind.net.*;
 //catches the mouse. If the cat catches the mouse then everything
 //resets to the start position.
 
+/** Grid Size
+ * Grid size is dynamic can be anything
+ */
+
 /** Pacman
  * Movements of pacman is controlled by the mind
  * Depending on where the ghosts are
@@ -40,7 +44,7 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int BOTTOM = GRID_SIZE - 1;
 
 	/* Pacman position */
-	protected Point pacmanPosition;
+	protected Point pacman;
 
 	/* Ghost positions */
 	protected Point redGhost;
@@ -50,10 +54,10 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Wall positions */
 	protected Point[] wall = new Point[400];
-	int size;
+	int size; //Size of wall array
 
 	/* Number of steps to run */
-	protected static final int MAX_STEPS = 20;
+	protected static final int MAX_STEPS = 100;
 
 	/* Number of lives */
 	protected static final int NO_LIVES = 3;
@@ -118,6 +122,10 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Initialise pacman and ghost positions on the grid */
 	protected void initPos() {
+		/* Pacman in the middle */
+		pacman = new Point(10,10);
+
+		/* Ghosts in each corner */
 		redGhost = new Point(TOP + 1, TOP + 1);
 		yellowGhost = new Point(RIGHT - 1, TOP + 1);
 		blueGhost = new Point(LEFT + 1, BOTTOM - 1);
@@ -127,6 +135,7 @@ public class PacmanWorld extends AbstractWorld {
 		int y = 0;
 		size = 0;
 
+		/* Outside wall positions */
 		for(x = 0; x < GRID_SIZE; x++) {
 			wall[size] = new Point(x,y);
 			size++;
@@ -157,6 +166,7 @@ public class PacmanWorld extends AbstractWorld {
 		return (r.nextInt(NO_ACTIONS));
 	}
 
+	/* Check is any position going over the boudaries */
 	boolean boundaryCheck(double pos) {
 		return (pos == TOP || pos == BOTTOM || pos == LEFT || pos == RIGHT);
 	}
@@ -238,6 +248,8 @@ public class PacmanWorld extends AbstractWorld {
 		if(imagesDesired) {
 			BufferedImage img = new BufferedImage((imgwidth*GRID_SIZE),(imgheight*GRID_SIZE),BufferedImage.TYPE_INT_RGB);
 
+			img.createGraphics().drawImage(pacmanImg,(imgwidth*pacman.x),(imgheight*pacman.y),null);
+
 			for(int i = 0; i < size; i++) {
 				img.createGraphics().drawImage(wallImg,(imgwidth*wall[i].x),(imgheight*wall[i].y),null);
 			}
@@ -262,6 +274,7 @@ public class PacmanWorld extends AbstractWorld {
 
 	public void newrun() throws RunError {
 		/* Create points to hold positions */
+		pacman = new Point();
 		redGhost = new Point();
 		blueGhost = new Point();
 		yellowGhost = new Point();
@@ -297,7 +310,8 @@ public class PacmanWorld extends AbstractWorld {
 	//======================================================================================================
 
 	private String ghostsAsString() {
-		String x = String.format("%d,%d, %d,%d, %d,%d, %d,%d",
+		String x = String.format("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
+				pacman.x, pacman.y,
 				redGhost.x,redGhost.y, blueGhost.x,blueGhost.y,
 				yellowGhost.x, yellowGhost.y, greenGhost.x, greenGhost.y);
 
@@ -345,45 +359,51 @@ public class PacmanWorld extends AbstractWorld {
 		move(greenGhost, randomAction());
 	}
 
+	private void movePacman(int direction) {
+		switch(direction) {
+			case 0: //action left
+				pacman.x--;
+				pacman.y--;
+				break;
+			case 1: //action right
+				pacman.x++;
+				pacman.y--;
+			case 2:
+				pacman.x--;
+			case 3:
+				pacman.y++;
+		}
+	}
+
 	//Take the action specified
 	public State takeaction(Action action) throws RunError {
 		//Add any number of images to a list of images for this step.
 		//The first image on the list for this step should be the image before we take the action.
 
-		initImages();	//If run with images off, imagesDesired = false and this does nothing.
+		/* Initialise the images */
+		initImages();
 
-		addImage();				// image before my move
-		// If run with images off, imagesDesired = false and this does nothing.
-
+		/* Parse the action */
 		String s = action.toString();		// parse the action
 		String[] a = s.split(",");		// parsed into a[0], a[1], ...
 		int i = Integer.parseInt(a[0]);		// ignore any other fields
 
-		//The action is a message from the mind to tell the cat what to do
-		//move(catPosition, i);
+		/* Make the move */
+		move(pacman, i);
 
 		//We want to show the individual movements of the cat and the mouse
 		//Add an image to the buffer to show the cat's movement
 		//This is the intermediate image, before mouse moves
 
-		//if(catPosition.equals(mousePosition)) {
-		//	numTimesMouseCaught++;		//Have already shown the catch action
-		//	numTimesMouseCaughtByCat++;	//caught due to cat's action, not mouse's action
-		//	initPos();			//Loop around, new image will be shown in next step
-		//} else {
-		//move the mouse randomly
-		//move(redGhost, ACTION_RIGHT);
+		/* Randomly move the ghost */
+		moveGhosts();
+		moveGhosts();
 		moveGhosts();
 
-		addImage(); 			// new image will be shown in next step
+		/* Add the new images */
+		addImage();
 
-		//	if(catPosition.equals(mousePosition)) {
-		//		addImage();          		//show the "capture" image
-		//		numTimesMouseCaught++;		//caught due to mouse's action
-		//		initPos();
-		//	}
-		//}
-
+		/* Move onto the next step */
 		timeStep++;
 
 		if(runFinished()) {
@@ -412,8 +432,7 @@ public class PacmanWorld extends AbstractWorld {
 	//  s2 = number of times mouse was caught due to cat's action (secondary score, larger is better)
 	//==========================================================================================================================
 
-
-	//Return the score
+	/* Return the score */
 	public Score getscore() throws RunError {
 		String s = String.format ("%d", caught);
 
@@ -424,13 +443,7 @@ public class PacmanWorld extends AbstractWorld {
 		return new Score(s, runFinished(), scoreColumnNames, values);
 	}
 
-
-	// Return image(s) of World.
-	// Image may show more information than State (what the Mind sees).
-	// This method actually returns a list of images, i.e. we allow multiple images per timestep.
-	// e.g. You move, get one image, the mouse moves, next image, your turn again (this is 2 images per timestep).
-	// This list of images should normally be built in takeaction method.
-	// The first image on the list for this step should be the image before we take the action on this step.
+	/* Return images of World */
 	public ArrayList<BufferedImage> getimage() throws RunError {
 		return buffer;
 	}
