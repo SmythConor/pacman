@@ -1,6 +1,3 @@
-//This is a 2-dimensional version of Mark Humphrys'
-//1-dimensional "Cops and Robbers" world with images.
-
 import java.awt.image.*;
 import java.io.*;
 import java.util.*;
@@ -123,7 +120,7 @@ public class PacmanWorld extends AbstractWorld {
 	/* Initialise pacman and ghost positions on the grid */
 	protected void initPos() {
 		/* Pacman in the middle */
-		pacman = new Point(10,10);
+		pacman = new Point(11,11);
 
 		/* Ghosts in each corner */
 		redGhost = new Point(TOP + 1, TOP + 1);
@@ -217,7 +214,6 @@ public class PacmanWorld extends AbstractWorld {
 					ImageIO.setUseCache(false);	//Use memory, not disk, for temporary images
 
 					pacmanStream	= getClass().getResourceAsStream(IMG_PACMAN);
-					//caughtStream = getClass().getResourceAsStream(IMG_CAUGHT);
 					wallStream = getClass().getResourceAsStream(IMG_WALL);
 
 					redGhostStream	= getClass().getResourceAsStream(IMG_RED_GHOST);
@@ -226,7 +222,6 @@ public class PacmanWorld extends AbstractWorld {
 					greenGhostStream	= getClass().getResourceAsStream(IMG_GREEN_GHOST);
 
 					pacmanImg = javax.imageio.ImageIO.read(pacmanStream);
-					//caughtImg	= javax.imageio.ImageIO.read(caughtStream);
 					wallImg = javax.imageio.ImageIO.read(wallStream);
 
 					redGhostImg = javax.imageio.ImageIO.read(redGhostStream);
@@ -241,7 +236,7 @@ public class PacmanWorld extends AbstractWorld {
 				catch(IOException e) {}
 			}
 		}
-	}//this should work
+	}
 
 	/* add image to buffer */
 	private void addImage() {
@@ -259,7 +254,7 @@ public class PacmanWorld extends AbstractWorld {
 			img.createGraphics().drawImage(yellowGhostImg,(imgwidth*yellowGhost.x),(imgheight*yellowGhost.y),null);
 			img.createGraphics().drawImage(greenGhostImg,(imgwidth*greenGhost.x),(imgheight*greenGhost.y),null);
 
-			//Add this image to the buffer for this timestep.
+			/* Add image to buffer */
 			buffer.add(img);
 		}
 	}
@@ -283,12 +278,12 @@ public class PacmanWorld extends AbstractWorld {
 		//Reset everything
 		timeStep = 0;
 		caught = 0;
-
+		
+		/* Initialise the postitions of everything */
 		initPos();
 
 		/* Set up headers for score fields */
 		scoreColumnNames = new LinkedList<>();
-
 		scoreColumnNames.add("Caught");
 	}
 
@@ -309,7 +304,7 @@ public class PacmanWorld extends AbstractWorld {
 	//   state s = "cx,cy,mx,my" (position of cat and mouse)
 	//======================================================================================================
 
-	private String ghostsAsString() {
+	private String positionsAsString() {
 		String x = String.format("%d,%d,%d,%d,%d,%d,%d,%d,%d,%d",
 				pacman.x, pacman.y,
 				redGhost.x,redGhost.y, blueGhost.x,blueGhost.y,
@@ -319,10 +314,9 @@ public class PacmanWorld extends AbstractWorld {
 	}
 
 
-	//Return the current state of the world
 	/* Returns the state of the world */
 	public State getstate() throws RunError {
-		String x = ghostsAsString();
+		String x = positionsAsString();
 
 		return new State(x);
 	}
@@ -359,61 +353,61 @@ public class PacmanWorld extends AbstractWorld {
 		move(greenGhost, randomAction());
 	}
 
-	private void movePacman(int direction) {
-		switch(direction) {
-			case 0: //action left
-				pacman.x--;
-				pacman.y--;
-				break;
-			case 1: //action right
-				pacman.x++;
-				pacman.y--;
-			case 2:
-				pacman.x--;
-			case 3:
-				pacman.y++;
+	private void checkCaught() {
+		if(pacman.equals(redGhost)) {
+			caught++;
+			redGhost = randomPosition();
+		} else if(pacman.equals(yellowGhost)) {
+			caught++;
+			yellowGhost = randomPosition();
+		} else if(pacman.equals(blueGhost)) {
+			caught++;
+			blueGhost = randomPosition();
+		} else if(pacman.equals(greenGhost)) {
+			caught++;
+			greenGhost = randomPosition();
 		}
 	}
 
 	//Take the action specified
 	public State takeaction(Action action) throws RunError {
-		//Add any number of images to a list of images for this step.
-		//The first image on the list for this step should be the image before we take the action.
-
 		/* Initialise the images */
 		initImages();
 
 		/* Parse the action */
-		String s = action.toString();		// parse the action
-		String[] a = s.split(",");		// parsed into a[0], a[1], ...
-		int i = Integer.parseInt(a[0]);		// ignore any other fields
+		String s = action.toString();
+		String[] a = s.split(",");
+		int i = Integer.parseInt(a[0]);
 
 		/* Make the move */
 		move(pacman, i);
 
-		//We want to show the individual movements of the cat and the mouse
-		//Add an image to the buffer to show the cat's movement
-		//This is the intermediate image, before mouse moves
+		/* Check to see if the ghost is caught */
+		checkCaught();
+		addImage();
 
-		/* Randomly move the ghost */
+		/* Randomly move the ghost and check if caught */
 		moveGhosts();
-		moveGhosts();
-		moveGhosts();
+		checkCaught();
+		addImage();
 
-		/* Add the new images */
+		moveGhosts();
+		checkCaught();
+		addImage();
+
+		moveGhosts();
+		checkCaught();
 		addImage();
 
 		/* Move onto the next step */
 		timeStep++;
-
+		
+		/* Check if the run is finished */
 		if(runFinished()) {
-			//There will be no loop round
 			addImage();
 		}
 
-		//The last timestep of the run shows the final state, and no action can be taken in this state.
-		//Whatever is the last image built on the run will be treated as the image for this final state.
-
+		/* Return the state of the world */
 		return getstate();
 	}
 
@@ -438,7 +432,6 @@ public class PacmanWorld extends AbstractWorld {
 
 		List<Comparable> values = new LinkedList<>();
 		values.add(caught);
-		//values.add(numTimesMouseCaughtByCat);
 
 		return new Score(s, runFinished(), scoreColumnNames, values);
 	}
