@@ -31,13 +31,13 @@ import org.w2mind.net.*;
 
 public class PacmanWorld extends AbstractWorld {
 	/* Dimensions of the grid */
-	public static final int GRID_SIZE = 20;
+	public static final int GRID_SIZE = 30;
 
 	/* Grid boundaries */
-	public static final int TOP = 0;
-	public static final int LEFT = 0;
-	public static final int RIGHT = 19;
-	public static final int BOTTOM = 19;
+	public static final int TOP = GRID_SIZE - GRID_SIZE;
+	public static final int LEFT = GRID_SIZE - GRID_SIZE;
+	public static final int RIGHT = GRID_SIZE - 1;
+	public static final int BOTTOM = GRID_SIZE - 1;
 
 	/* Pacman position */
 	protected Point pacmanPosition;
@@ -48,7 +48,9 @@ public class PacmanWorld extends AbstractWorld {
 	protected Point yellowGhost;
 	protected Point greenGhost;
 
-	protected Point[] wall = new Point[78];
+	/* Wall positions */
+	protected Point[] wall = new Point[400];
+	int size;
 
 	/* Number of steps to run */
 	protected static final int MAX_STEPS = 20;
@@ -116,34 +118,34 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Initialise pacman and ghost positions on the grid */
 	protected void initPos() {
-		redGhost = new Point(1,1);
-		yellowGhost = new Point(18,1);
-		blueGhost = new Point(1,18);
-		greenGhost = new Point(18,18);
+		redGhost = new Point(TOP + 1, TOP + 1);
+		yellowGhost = new Point(RIGHT - 1, TOP + 1);
+		blueGhost = new Point(LEFT + 1, BOTTOM - 1);
+		greenGhost = new Point(RIGHT - 1, BOTTOM - 1);
 
 		int x = 0;
 		int y = 0;
-		int count = 0;
+		size = 0;
 
-		for(x = 0; x < 20; x++) {
-			wall[count] = new Point(x,y);
-			count++;
+		for(x = 0; x < GRID_SIZE; x++) {
+			wall[size] = new Point(x,y);
+			size++;
 		}
 
-		for(y = 1; y < 20; y++) {
-			x = 0;
-			wall[count] = new Point(x,y);
-			count++;
-			x = 19;
-			wall[count] = new Point(x,y);
-			count++;
+		for(y = 1; y < GRID_SIZE; y++) {
+			x = LEFT;
+			wall[size] = new Point(x,y);
+			size++;
+			x = RIGHT;
+			wall[size] = new Point(x,y);
+			size++;
 		}
 
-		y = 19;
+		y = RIGHT;
 
-		for(x = 0; x < 20; x++) {
-			wall[count] = new Point(x,y);
-			count++;
+		for(x = 0; x < GRID_SIZE; x++) {
+			wall[size] = new Point(x,y);
+			size++;
 		}
 
 	}
@@ -236,7 +238,7 @@ public class PacmanWorld extends AbstractWorld {
 		if(imagesDesired) {
 			BufferedImage img = new BufferedImage((imgwidth*GRID_SIZE),(imgheight*GRID_SIZE),BufferedImage.TYPE_INT_RGB);
 
-			for(int i = 0; i < 78; i++) {
+			for(int i = 0; i < size; i++) {
 				img.createGraphics().drawImage(wallImg,(imgwidth*wall[i].x),(imgheight*wall[i].y),null);
 			}
 
