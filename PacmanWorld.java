@@ -1,7 +1,5 @@
 /** @author Conor Smyth 12452382
  *  @since 01/12/2014
- *  
- * <p>Simple Pacman</p>
  */
 
 import java.awt.image.*;
@@ -46,6 +44,10 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int RIGHT = GRID_SIZE - 1;
 	public static final int BOTTOM = GRID_SIZE - 1;
 
+	/* Wall boundaries */
+	public static final int X_LEFT = TOP + 4;
+	public static final int Y_LEFT = TOP + 2;
+
 	/* Pacman position */
 	protected Point pacman;
 
@@ -65,6 +67,7 @@ public class PacmanWorld extends AbstractWorld {
 	/* Number of lives */
 	protected static final int NO_LIVES = 3;
 
+	
 	/* Number of times caught */
 	protected int caught;
 
@@ -165,6 +168,24 @@ public class PacmanWorld extends AbstractWorld {
 
 		for(x = 0; x < GRID_SIZE; x++) {
 			wall[size] = new Point(x,y);
+			size++;
+		}
+
+		x = X_LEFT;
+		y = Y_LEFT;
+
+		for(int i = 0; i < 3; i++) {
+			wall[size] = new Point(x,y);
+			y++;
+			size++;
+		}
+
+		x = Y_LEFT;
+		y = Y_LEFT;
+
+		for(int i = 0; i < 5; i++) {
+			wall[size] = new Point(x,y);
+			x++;
 			size++;
 		}
 
