@@ -18,16 +18,24 @@ import org.w2mind.net.*;
 //catches the mouse. If the cat catches the mouse then everything
 //resets to the start position.
 
-//The aim of this code is to give you a basis on which to build
-//your own 2-dimensional worlds.
+/** Pacman
+ * Movements of pacman is controlled by the mind
+ * Depending on where the ghosts are
+ */
+
+
+/** Ghosts
+ * Movement of ghosts is controlled by world
+ * Movement is random
+ */
 
 public class PacmanWorld extends AbstractWorld {
 	/* Dimensions of the grid */
-	public static final int GRID_SIZE = 20;		//The dimensions of the grid in 2 dimensions
+	public static final int GRID_SIZE = 20;
 
 	/* Grid boundaries */
-	public static final int TOP = 1;
-	public static final int LEFT = 1;
+	public static final int TOP = 0;
+	public static final int LEFT = 0;
 	public static final int RIGHT = 19;
 	public static final int BOTTOM = 19;
 
@@ -39,6 +47,8 @@ public class PacmanWorld extends AbstractWorld {
 	protected Point blueGhost;
 	protected Point yellowGhost;
 	protected Point greenGhost;
+
+	protected Point[] wall = new Point[78];
 
 	/* Number of steps to run */
 	protected static final int MAX_STEPS = 20;
@@ -67,15 +77,16 @@ public class PacmanWorld extends AbstractWorld {
 	String IMG_BLUE_GHOST = SUPPORT_DIR + "/blueghost.gif";
 	String IMG_YELLOW_GHOST = SUPPORT_DIR + "/yellieghost.png";
 	String IMG_GREEN_GHOST = SUPPORT_DIR + "/greenghost.png";
-
+	String IMG_WALL = SUPPORT_DIR + "/wall.png";
 
 	//transient - don't serialise these:
 	//The data contained in these classes is generated at run time and should not be persisted.
 	private transient ArrayList<BufferedImage> buffer;
-	
+
 	/* Set up input streams */
 	private transient InputStream pacmanStream = null;
 	private transient InputStream caughtStream = null;
+	private transient	InputStream wallStream = null;
 
 	private transient	InputStream redGhostStream = null;
 	private transient	InputStream blueGhostStream = null;
@@ -83,8 +94,9 @@ public class PacmanWorld extends AbstractWorld {
 	private transient	InputStream greenGhostStream = null;
 
 	/* Set up buffers for images */
-  private transient BufferedImage pacmanImg;
+	private transient BufferedImage pacmanImg;
 	private transient BufferedImage caughtImg;
+	private transient BufferedImage wallImg;
 
 	private transient BufferedImage redGhostImg;
 	private transient BufferedImage blueGhostImg;
@@ -104,10 +116,36 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Initialise pacman and ghost positions on the grid */
 	protected void initPos() {
-		redGhost = new Point(TOP + 1, LEFT + 1); // 2,2
-		yellowGhost = new Point(RIGHT - 1, TOP); //18,2
-		blueGhost = new Point(BOTTOM - 1, LEFT + 1); //2,18
-		greenGhost = new Point(RIGHT - 1, BOTTOM - 1); //18,18
+		redGhost = new Point(1,1);
+		yellowGhost = new Point(18,1);
+		blueGhost = new Point(1,18);
+		greenGhost = new Point(18,18);
+
+		int x = 0;
+		int y = 0;
+		int count = 0;
+
+		for(x = 0; x < 20; x++) {
+			wall[count] = new Point(x,y);
+			count++;
+		}
+
+		for(y = 1; y < 20; y++) {
+			x = 0;
+			wall[count] = new Point(x,y);
+			count++;
+			x = 19;
+			wall[count] = new Point(x,y);
+			count++;
+		}
+
+		y = 19;
+
+		for(x = 0; x < 20; x++) {
+			wall[count] = new Point(x,y);
+			count++;
+		}
+
 	}
 
 	/* Generate a random action */
@@ -117,16 +155,36 @@ public class PacmanWorld extends AbstractWorld {
 		return (r.nextInt(NO_ACTIONS));
 	}
 
+	boolean boundaryCheck(double pos) {
+		return (pos == TOP || pos == BOTTOM || pos == LEFT || pos == RIGHT);
+	}
+
 	/* Move from position */
 	private void move(Point startPos, int direction) {
 		if(direction == ACTION_LEFT)	{
-			startPos.x = ((startPos.x - 1 + GRID_SIZE) % GRID_SIZE);
-		} if(direction == ACTION_RIGHT)	{
-			startPos.x = ((startPos.x + 1 + GRID_SIZE) % GRID_SIZE);
-		} if(direction == ACTION_UP) {
-			startPos.y = ((startPos.y - 1 + GRID_SIZE) % GRID_SIZE);
-		} if(direction == ACTION_DOWN) {
-			startPos.y = ((startPos.y + 1 + GRID_SIZE) % GRID_SIZE);
+			if(boundaryCheck((startPos.x - 1))) {
+				direction = ACTION_RIGHT;
+			} else {
+				startPos.x--;
+			}
+		} else if(direction == ACTION_RIGHT)	{
+			if(boundaryCheck(startPos.x + 1)) {
+				direction = ACTION_UP;
+			} else {
+				startPos.x++;
+			}
+		} else if(direction == ACTION_UP) {
+			if(boundaryCheck(startPos.y - 1)) {
+				direction = ACTION_DOWN;
+			} else {
+				startPos.y--;
+			}
+		} else if(direction == ACTION_DOWN) {
+			if(boundaryCheck(startPos.y + 1)) {
+				move(startPos, ACTION_LEFT);
+			} else {
+				startPos.y++;
+			}
 		}
 	}
 
@@ -148,15 +206,16 @@ public class PacmanWorld extends AbstractWorld {
 
 					pacmanStream	= getClass().getResourceAsStream(IMG_PACMAN);
 					//caughtStream = getClass().getResourceAsStream(IMG_CAUGHT);
+					wallStream = getClass().getResourceAsStream(IMG_WALL);
 
 					redGhostStream	= getClass().getResourceAsStream(IMG_RED_GHOST);
 					blueGhostStream	= getClass().getResourceAsStream(IMG_BLUE_GHOST);
 					yellowGhostStream	= getClass().getResourceAsStream(IMG_YELLOW_GHOST);
 					greenGhostStream	= getClass().getResourceAsStream(IMG_GREEN_GHOST);
 
-
-					pacmanImg = javax.imageio.ImageIO.read(pacmanStream); ////////////////////////////
+					pacmanImg = javax.imageio.ImageIO.read(pacmanStream);
 					//caughtImg	= javax.imageio.ImageIO.read(caughtStream);
+					wallImg = javax.imageio.ImageIO.read(wallStream);
 
 					redGhostImg = javax.imageio.ImageIO.read(redGhostStream);
 					blueGhostImg = javax.imageio.ImageIO.read(blueGhostStream);
@@ -170,25 +229,21 @@ public class PacmanWorld extends AbstractWorld {
 				catch(IOException e) {}
 			}
 		}
-	}
+	}//this should work
 
 	/* add image to buffer */
 	private void addImage() {
 		if(imagesDesired) {
 			BufferedImage img = new BufferedImage((imgwidth*GRID_SIZE),(imgheight*GRID_SIZE),BufferedImage.TYPE_INT_RGB);
 
-			//if(catPosition.equals(mousePosition)) {
-				//The cat has caught the ,ouse so display the explosion
-				//img.createGraphics().drawImage(caughtImg,(imgwidth*catPosition.x),(imgheight*catPosition.y),null);
-			//} else {
-				//Otherwise just display the cat and mouse images
-				//img.createGraphics().drawImage(pacmanImg,(imgwidth*pacmanPosition.x),(imgheight*pacmanPosition.y),null);
+			for(int i = 0; i < 78; i++) {
+				img.createGraphics().drawImage(wallImg,(imgwidth*wall[i].x),(imgheight*wall[i].y),null);
+			}
 
-				img.createGraphics().drawImage(redGhostImg,(imgwidth*redGhost.x),(imgheight*redGhost.y),null);
-				img.createGraphics().drawImage(blueGhostImg,(imgwidth*blueGhost.x),(imgheight*blueGhost.y),null);
-				img.createGraphics().drawImage(yellowGhostImg,(imgwidth*yellowGhost.x),(imgheight*yellowGhost.y),null);
-				img.createGraphics().drawImage(greenGhostImg,(imgwidth*greenGhost.x),(imgheight*greenGhost.y),null);
-			//}
+			img.createGraphics().drawImage(redGhostImg,(imgwidth*redGhost.x),(imgheight*redGhost.y),null);
+			img.createGraphics().drawImage(blueGhostImg,(imgwidth*blueGhost.x),(imgheight*blueGhost.y),null);
+			img.createGraphics().drawImage(yellowGhostImg,(imgwidth*yellowGhost.x),(imgheight*yellowGhost.y),null);
+			img.createGraphics().drawImage(greenGhostImg,(imgwidth*greenGhost.x),(imgheight*greenGhost.y),null);
 
 			//Add this image to the buffer for this timestep.
 			buffer.add(img);
@@ -196,11 +251,11 @@ public class PacmanWorld extends AbstractWorld {
 	}
 
 	/**
-	* World must respond to these methods: 
-	* newrun(), endrun()
-	* getstate(), takeaction()
-	* getscore(), getimage()
-	*/
+	 * World must respond to these methods:
+	 * newrun(), endrun()
+	 * getstate(), takeaction()
+	 * getscore(), getimage()
+	 */
 
 
 	public void newrun() throws RunError {
@@ -241,8 +296,8 @@ public class PacmanWorld extends AbstractWorld {
 
 	private String ghostsAsString() {
 		String x = String.format("%d,%d, %d,%d, %d,%d, %d,%d",
-			redGhost.x,redGhost.y, blueGhost.x,blueGhost.y,
-			yellowGhost.x, yellowGhost.y, greenGhost.x, greenGhost.y);
+				redGhost.x,redGhost.y, blueGhost.x,blueGhost.y,
+				yellowGhost.x, yellowGhost.y, greenGhost.x, greenGhost.y);
 
 		return x;
 	}
@@ -281,6 +336,13 @@ public class PacmanWorld extends AbstractWorld {
 	//  action a = "i,w1,w2,...,wn"
 	//=========================================================================================================
 
+	private void moveGhosts() {
+		move(redGhost, randomAction());
+		move(yellowGhost, randomAction());
+		move(blueGhost, randomAction());
+		move(greenGhost, randomAction());
+	}
+
 	//Take the action specified
 	public State takeaction(Action action) throws RunError {
 		//Add any number of images to a list of images for this step.
@@ -301,17 +363,17 @@ public class PacmanWorld extends AbstractWorld {
 		//We want to show the individual movements of the cat and the mouse
 		//Add an image to the buffer to show the cat's movement
 		//This is the intermediate image, before mouse moves
-		addImage();
 
 		//if(catPosition.equals(mousePosition)) {
 		//	numTimesMouseCaught++;		//Have already shown the catch action
 		//	numTimesMouseCaughtByCat++;	//caught due to cat's action, not mouse's action
 		//	initPos();			//Loop around, new image will be shown in next step
 		//} else {
-			//move the mouse randomly
-			move(redGhost, randomAction());
+		//move the mouse randomly
+		//move(redGhost, ACTION_RIGHT);
+		moveGhosts();
 
-			// addImage(); 			// new image will be shown in next step
+		addImage(); 			// new image will be shown in next step
 
 		//	if(catPosition.equals(mousePosition)) {
 		//		addImage();          		//show the "capture" image
