@@ -36,7 +36,35 @@ import org.w2mind.net.*;
 
 public class PacmanWorld extends AbstractWorld {
 	/* Dimensions of the grid */
-	public static final int GRID_SIZE = 30;
+	public static final int GRID_SIZE = 17;
+	public static final int GRID_SIZE_X = GRID_SIZE;
+	public static final int GRID_SIZE_Y = GRID_SIZE;
+	//8,8
+	//1,1 //1,18 //14,1 //14,18
+	public static int[][] grid = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, /* 0 */
+													 			{1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1}, /* 1 */ 
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 2 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 3 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 4 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 5 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 6 */
+																{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 7 */
+													 			{1,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,1}, /* 8 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 9 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 10 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 11 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 12 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 13 */
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 14 */
+																{1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1}, /* 15 */
+													 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};/* 16 */
+	
+	public static final int WALL = 1;
+	public static final int RED_GHOST = 2;
+	public static final int YELLOW_GHOST = 3;
+	public static final int BLUE_GHOST = 4;
+	public static final int GREEN_GHOST = 5;
+	public static final int PACMAN = 6;
 
 	/* Grid boundaries */
 	public static final int TOP = GRID_SIZE - GRID_SIZE;
@@ -45,8 +73,8 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int BOTTOM = GRID_SIZE - 1;
 
 	/* Wall boundaries */
-	public static final int X_LEFT = TOP + 4;
-	public static final int Y_LEFT = TOP + 2;
+	public static final int X_LEFT = TOP + 1;
+	public static final int Y_LEFT = TOP + 1;
 
 	/* Pacman position */
 	protected Point pacman;
@@ -62,12 +90,12 @@ public class PacmanWorld extends AbstractWorld {
 	int size; //Size of wall array
 
 	/* Number of steps to run */
-	protected static final int MAX_STEPS = 100;
+	protected static final int MAX_STEPS = 5;
 
 	/* Number of lives */
 	protected static final int NO_LIVES = 3;
 
-	
+
 	/* Number of times caught */
 	protected int caught;
 
@@ -99,7 +127,6 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Set up input streams */
 	private transient InputStream pacmanStream = null;
-	private transient InputStream caughtStream = null;
 	private transient	InputStream wallStream = null;
 
 	private transient	InputStream redGhostStream = null;
@@ -109,7 +136,6 @@ public class PacmanWorld extends AbstractWorld {
 
 	/* Set up buffers for images */
 	private transient BufferedImage pacmanImg;
-	private transient BufferedImage caughtImg;
 	private transient BufferedImage wallImg;
 
 	private transient BufferedImage redGhostImg;
@@ -131,19 +157,19 @@ public class PacmanWorld extends AbstractWorld {
 		return new Point(r.nextInt(GRID_SIZE),r.nextInt(GRID_SIZE));
 	}
 
-	/** 
+	/**
 	* Initialise pacman and ghost positions on the grid.
 	* @return Nothing.
 	*/
 	protected void initPos() {
 		/* Pacman in the middle */
-		pacman = new Point(11,11);
+		pacman = new Point(8,8);
 
 		/* Ghosts in each corner */
 		redGhost = new Point(TOP + 1, TOP + 1);
-		yellowGhost = new Point(RIGHT - 1, TOP + 1);
-		blueGhost = new Point(LEFT + 1, BOTTOM - 1);
-		greenGhost = new Point(RIGHT - 1, BOTTOM - 1);
+		yellowGhost = new Point(TOP + 1, RIGHT - 1);
+		blueGhost = new Point(BOTTOM - 1, LEFT + 1);
+		greenGhost = new Point(BOTTOM - 1, RIGHT - 1);
 
 		int x = 0;
 		int y = 0;
@@ -201,7 +227,7 @@ public class PacmanWorld extends AbstractWorld {
 		return (r.nextInt(NO_ACTIONS));
 	}
 
-	/** 
+	/**
 	* Check is any position going over the boudaries.
 	* @param pos This is the position of an object.
 	* @return boolean This returns whether an object has crossed a boundary.
@@ -210,7 +236,7 @@ public class PacmanWorld extends AbstractWorld {
 		return (pos == TOP || pos == BOTTOM || pos == LEFT || pos == RIGHT);
 	}
 
-	/** 
+	/**
 	* Move from position.
 	* @param startPos First parameter position.
 	* @return Nothing.
@@ -298,16 +324,24 @@ public class PacmanWorld extends AbstractWorld {
 		if(imagesDesired) {
 			BufferedImage img = new BufferedImage((imgwidth*GRID_SIZE),(imgheight*GRID_SIZE),BufferedImage.TYPE_INT_RGB);
 
-			img.createGraphics().drawImage(pacmanImg,(imgwidth*pacman.x),(imgheight*pacman.y),null);
-
-			for(int i = 0; i < size; i++) {
-				img.createGraphics().drawImage(wallImg,(imgwidth*wall[i].x),(imgheight*wall[i].y),null);
+			for(int x = 0; x < GRID_SIZE_X; x++) {
+				for(int y = 0; y < GRID_SIZE_Y; y++) {
+					Point p = new Point(x,y);
+					if(grid[x][y] == 1) {
+						img.createGraphics().drawImage(wallImg,(imgwidth*p.x),(imgheight*p.y),null);
+					} else if(grid[x][y] == 6) {
+						img.createGraphics().drawImage(pacmanImg,(imgwidth*p.x),(imgheight*p.y),null);
+					} else if(grid[x][y] == 2) {
+						img.createGraphics().drawImage(redGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
+					} else if(grid[x][y] == 3) {
+						img.createGraphics().drawImage(yellowGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
+					} else if(grid[x][y] == 4) {
+						img.createGraphics().drawImage(blueGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
+					} else if(grid[x][y] == 5) {
+						img.createGraphics().drawImage(greenGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
+					}
+				}
 			}
-
-			img.createGraphics().drawImage(redGhostImg,(imgwidth*redGhost.x),(imgheight*redGhost.y),null);
-			img.createGraphics().drawImage(blueGhostImg,(imgwidth*blueGhost.x),(imgheight*blueGhost.y),null);
-			img.createGraphics().drawImage(yellowGhostImg,(imgwidth*yellowGhost.x),(imgheight*yellowGhost.y),null);
-			img.createGraphics().drawImage(greenGhostImg,(imgwidth*greenGhost.x),(imgheight*greenGhost.y),null);
 
 			/* Add image to buffer */
 			buffer.add(img);
@@ -340,7 +374,7 @@ public class PacmanWorld extends AbstractWorld {
 		caught = 0;
 
 		/* Initialise the postitions of everything */
-		initPos();
+		//initPos();
 
 		/* Set up headers for score fields */
 		scoreColumnNames = new LinkedList<>();
@@ -478,13 +512,13 @@ public class PacmanWorld extends AbstractWorld {
 		checkCaught();
 		addImage();
 
-		moveGhosts();
-		checkCaught();
-		addImage();
+		//moveGhosts();
+		//checkCaught();
+		//addImage();
 
-		moveGhosts();
-		checkCaught();
-		addImage();
+		//moveGhosts();
+		//checkCaught();
+		//addImage();
 
 		/* Move onto the next step */
 		timeStep++;
@@ -513,7 +547,7 @@ public class PacmanWorld extends AbstractWorld {
 	//  s2 = number of times mouse was caught due to cat's action (secondary score, larger is better)
 	//==========================================================================================================================
 
-	/** 
+	/**
 	* Return the score.
 	* @return Score This is the score of the game.
 	* @exception RunError On run error.
@@ -528,7 +562,7 @@ public class PacmanWorld extends AbstractWorld {
 		return new Score(s, runFinished(), scoreColumnNames, values);
 	}
 
-	/** 
+	/**
 	* Return images of World.
 	* @return Nothing.
 	* @exception RunError On run error.
