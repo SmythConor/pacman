@@ -41,24 +41,24 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int GRID_SIZE_Y = GRID_SIZE;
 	//8,8
 	//1,1 //1,18 //14,1 //14,18
-	public static int[][] grid = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}, /* 0 */
-													 			{1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1}, /* 1 */ 
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 2 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 3 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 4 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 5 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 6 */
-																{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 7 */
-													 			{1,0,0,0,0,0,0,0,6,0,0,0,0,0,0,0,1}, /* 8 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 9 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 10 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 11 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 12 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 13 */
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1}, /* 14 */
-																{1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1}, /* 15 */
-													 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};/* 16 */
-	
+	public static int[][] grid = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+													 			{1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1},
+													 			{1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1},
+													 			{1,0,1,1,1,0,0,0,0,0,0,0,1,1,1,0,1},
+													 			{1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1},
+													 			{1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1},
+																{1,0,0,1,0,0,0,1,0,1,0,0,0,1,0,0,1},
+													 			{1,0,0,0,0,0,0,1,6,1,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+																{1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1},
+													 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
+
 	public static final int WALL = 1;
 	public static final int RED_GHOST = 2;
 	public static final int YELLOW_GHOST = 3;
@@ -85,12 +85,8 @@ public class PacmanWorld extends AbstractWorld {
 	protected Point yellowGhost;
 	protected Point greenGhost;
 
-	/* Wall positions */
-	protected Point[] wall = new Point[400];
-	int size; //Size of wall array
-
 	/* Number of steps to run */
-	protected static final int MAX_STEPS = 5;
+	protected static final int MAX_STEPS = 100;
 
 	/* Number of lives */
 	protected static final int NO_LIVES = 3;
@@ -166,55 +162,10 @@ public class PacmanWorld extends AbstractWorld {
 		pacman = new Point(8,8);
 
 		/* Ghosts in each corner */
-		redGhost = new Point(TOP + 1, TOP + 1);
+		redGhost = new Point(TOP + 1, LEFT + 1);
 		yellowGhost = new Point(TOP + 1, RIGHT - 1);
 		blueGhost = new Point(BOTTOM - 1, LEFT + 1);
 		greenGhost = new Point(BOTTOM - 1, RIGHT - 1);
-
-		int x = 0;
-		int y = 0;
-		size = 0;
-
-		/* Outside wall positions */
-		for(x = 0; x < GRID_SIZE; x++) {
-			wall[size] = new Point(x,y);
-			size++;
-		}
-
-		for(y = 1; y < GRID_SIZE; y++) {
-			x = LEFT;
-			wall[size] = new Point(x,y);
-			size++;
-			x = RIGHT;
-			wall[size] = new Point(x,y);
-			size++;
-		}
-
-		y = RIGHT;
-
-		for(x = 0; x < GRID_SIZE; x++) {
-			wall[size] = new Point(x,y);
-			size++;
-		}
-
-		x = X_LEFT;
-		y = Y_LEFT;
-
-		for(int i = 0; i < 3; i++) {
-			wall[size] = new Point(x,y);
-			y++;
-			size++;
-		}
-
-		x = Y_LEFT;
-		y = Y_LEFT;
-
-		for(int i = 0; i < 5; i++) {
-			wall[size] = new Point(x,y);
-			x++;
-			size++;
-		}
-
 	}
 
 	/**
@@ -232,8 +183,8 @@ public class PacmanWorld extends AbstractWorld {
 	* @param pos This is the position of an object.
 	* @return boolean This returns whether an object has crossed a boundary.
 	*/
-	boolean boundaryCheck(double pos) {
-		return (pos == TOP || pos == BOTTOM || pos == LEFT || pos == RIGHT);
+	boolean boundaryCheck(int x, int y) {
+		return grid[x][y] == 1;
 	}
 
 	/**
@@ -242,31 +193,45 @@ public class PacmanWorld extends AbstractWorld {
 	* @return Nothing.
 	*/
 	private void move(Point startPos, int direction) {
+		int x = startPos.x;
+		int y = startPos.y;
+		int temp = grid[x][y];
+
 		if(direction == ACTION_LEFT)	{
-			if(boundaryCheck((startPos.x - 1))) {
+			if(boundaryCheck(x - 1, y)) {
 				direction = ACTION_RIGHT;
 			} else {
-				startPos.x--;
+				grid[x][y] = 0;
+				x--;
+				grid[x][y] = temp;
 			}
 		} else if(direction == ACTION_RIGHT)	{
-			if(boundaryCheck(startPos.x + 1)) {
+			if(boundaryCheck(x + 1, y)) {
 				direction = ACTION_UP;
 			} else {
-				startPos.x++;
+				grid[x][y] = 0;
+				x++;
+				grid[x][y] = temp;
 			}
 		} else if(direction == ACTION_UP) {
-			if(boundaryCheck(startPos.y - 1)) {
+			if(boundaryCheck(x, y - 1)) {
 				direction = ACTION_DOWN;
 			} else {
-				startPos.y--;
+				grid[x][y] = 0;
+				y--;
+				grid[x][y] = temp;
 			}
 		} else if(direction == ACTION_DOWN) {
-			if(boundaryCheck(startPos.y + 1)) {
+			if(boundaryCheck(x, y + 1)) {
 				move(startPos, ACTION_LEFT);
 			} else {
-				startPos.y++;
+				grid[x][y] = 0;
+				y++;
+				grid[x][y] = temp;
 			}
 		}
+
+		startPos = new Point(x,y);
 	}
 
 	/**
@@ -374,7 +339,7 @@ public class PacmanWorld extends AbstractWorld {
 		caught = 0;
 
 		/* Initialise the postitions of everything */
-		//initPos();
+		initPos();
 
 		/* Set up headers for score fields */
 		scoreColumnNames = new LinkedList<>();
@@ -512,13 +477,13 @@ public class PacmanWorld extends AbstractWorld {
 		checkCaught();
 		addImage();
 
-		//moveGhosts();
-		//checkCaught();
-		//addImage();
+		moveGhosts();
+		checkCaught();
+		addImage();
 
-		//moveGhosts();
-		//checkCaught();
-		//addImage();
+		moveGhosts();
+		checkCaught();
+		addImage();
 
 		/* Move onto the next step */
 		timeStep++;
