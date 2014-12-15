@@ -66,19 +66,19 @@ public class PacmanMind implements Mind {
 
 			//Now decide which way to move			
 			if(distanceX < 0) {
-				action = PacmanWorld.ACTION_LEFT;
+				action = PacmanWorld.ACTION_DOWN;
 			} else {
-				action = PacmanWorld.ACTION_RIGHT;
+				action = PacmanWorld.ACTION_UP;
 			}
 		} else {
 			//We move in the y direction
 			//Now decide which way to move			
 			if(distanceY < 0) {
 				//mouse is below cat
-				action = PacmanWorld.ACTION_UP;
+				action = PacmanWorld.ACTION_RIGHT;
 			} else {
 				//mouse is to the left or in line of cat
-				action = PacmanWorld.ACTION_DOWN;
+				action = PacmanWorld.ACTION_LEFT;
 			}
 		}
 

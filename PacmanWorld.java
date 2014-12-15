@@ -39,22 +39,23 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int GRID_SIZE = 17;
 	public static final int GRID_SIZE_X = GRID_SIZE;
 	public static final int GRID_SIZE_Y = GRID_SIZE;
+
 	//8,8
 	//1,1 //1,18 //14,1 //14,18
 	public static int[][] grid = {{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 													 			{1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1},
 													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
+													 			{1,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,1},
+													 			{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
 													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 																{1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1},
 													 			{1,0,0,0,0,0,0,1,6,1,0,0,0,0,0,0,1},
 													 			{1,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,1},
 													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+													 			{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
+													 			{1,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,1},
+													 			{1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1},
 													 			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
 																{1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,5,1},
 													 			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}};
@@ -72,9 +73,9 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int RIGHT = GRID_SIZE - 1;
 	public static final int BOTTOM = GRID_SIZE - 1;
 
-	/* Wall boundaries */
-	public static final int X_LEFT = TOP + 1;
-	public static final int Y_LEFT = TOP + 1;
+	/**/
+	private int posX;
+	private int posY;
 
 	/* Pacman position */
 	protected Point pacman;
@@ -185,19 +186,26 @@ public class PacmanWorld extends AbstractWorld {
 	/* Random action methods*/
 
 	/**
-	* This method generates a random point.
-	* @return Point This returns a new point inside the grid.
-	*/
+	 * This method generates a random point.
+	 * @return Point This returns a new point inside the grid.
+	 */
 	protected Point randomPosition() {
 		Random r = new Random();
+		int x = 0;
+		int y = 0;
 
-		return new Point(r.nextInt(GRID_SIZE),r.nextInt(GRID_SIZE));
+		do {
+			x = r.nextInt(GRID_SIZE);
+			y = r.nextInt(GRID_SIZE);
+		} while(x == TOP || x == BOTTOM || y == TOP || y == BOTTOM);
+
+		return new Point(x, y);
 	}
 
 	/**
-	* Generate a random action.
-	* @return int This returns random action.
-	*/
+	 * Generate a random action.
+	 * @return int This returns random action.
+	 */
 	private int randomAction() {
 		Random r = new Random();
 
@@ -225,25 +233,29 @@ public class PacmanWorld extends AbstractWorld {
 		if(pacman.equals(redGhost)) {
 			caught++;
 			redGhost = randomPosition();
+			grid[redGhost.x][redGhost.y] = RED_GHOST;
 		} else if(pacman.equals(yellowGhost)) {
 			caught++;
 			yellowGhost = randomPosition();
+			grid[yellowGhost.x][yellowGhost.y] = YELLOW_GHOST;
 		} else if(pacman.equals(blueGhost)) {
 			caught++;
 			blueGhost = randomPosition();
+			grid[blueGhost.x][blueGhost.y] = BLUE_GHOST;
 		} else if(pacman.equals(greenGhost)) {
 			caught++;
 			greenGhost = randomPosition();
+			grid[greenGhost.x][greenGhost.y] = GREEN_GHOST;
 		}
 	}
 
 	/* General move methods */
 
 	/**
-	* Check is any position going over the boudaries.
-	* @param pos This is the position of an object.
-	* @return boolean This returns whether an object has crossed a boundary.
-	*/
+	 * Check is any position going over the boudaries.
+	 * @param pos This is the position of an object.
+	 * @return boolean This returns whether an object has crossed a boundary.
+	 */
 	private boolean boundaryCheck(int x, int y) {
 		return grid[x][y] > 0 && grid[x][y] < 6;
 	}
@@ -253,65 +265,65 @@ public class PacmanWorld extends AbstractWorld {
 	}
 
 	/**
-	* Move from position.
-	* @param startPos First parameter position.
-	* @return Nothing.
-	*/
+	 * Move from position.
+	 * @param startPos First parameter position.
+	 * @return Nothing.
+	 */
 	private Point move(Point startPos, int direction) {
 		int x = startPos.x;
 		int y = startPos.y;
 		int temp = grid[x][y];
 
 		if(temp == 6) {
-			if(timeStep < 3) {
+			if(timeStep < 2) {
 				grid[x][y] = -1;
-				y--;
+				x--;
 				grid[x][y] = temp;
 			} else {
-				if(direction == ACTION_LEFT) {
-					if(pacmanBoundary(x - 1, y)) {
-						direction = ACTION_RIGHT;
-					} else {
-						grid[x][y] = 0;
-						x--;
-						grid[x][y] = temp;
-					}
-				} else if(direction == ACTION_RIGHT) {
-					if(pacmanBoundary(x, y + 1)) {
-						direction = ACTION_DOWN;
-					} else {
-						grid[x][y] = 0;
-						x++;
-						grid[x][y] = temp;
-					}
-				} else if(direction == ACTION_DOWN) {
-					if(pacmanBoundary(x + 1, y)) {
-						direction = ACTION_UP;
-					} else {
-						grid[x][y] = 0;
-						y++;
-						grid[x][y] = temp;
-					}
-				} else if(direction == ACTION_UP) {
+				if(direction == ACTION_LEFT) { //move left must be y--
 					if(pacmanBoundary(x, y - 1)) {
-						return move(startPos, ACTION_LEFT);
+						direction = ACTION_RIGHT;
 					} else {
 						grid[x][y] = 0;
 						y--;
 						grid[x][y] = temp;
 					}
+				} else if(direction == ACTION_RIGHT) { //move right must be y++
+					if(pacmanBoundary(x, y + 1)) {
+						direction = ACTION_DOWN;
+					} else {
+						grid[x][y] = 0;
+						y++;
+						grid[x][y] = temp;
+					}
+				} else if(direction == ACTION_DOWN) { //move down must be x++
+					if(pacmanBoundary(x + 1, y)) {
+						direction = ACTION_UP;
+					} else {
+						grid[x][y] = 0;
+						x++;
+						grid[x][y] = temp;
+					}
+				} else if(direction == ACTION_UP) { //move up is  x--
+					if(pacmanBoundary(x - 1, y)) {
+						return move(startPos, ACTION_LEFT);
+					} else {
+						grid[x][y] = 0;
+						x--;
+						grid[x][y] = temp;
+					}
 				}
 			}
 		} else {
-			if(direction == ACTION_LEFT)	{
-				if(boundaryCheck(x - 1, y)) {
+			if(direction == ACTION_LEFT)	{ //must be y--
+				if(boundaryCheck(x, y - 1)) {
 					direction = ACTION_RIGHT;
 				} else {
 					grid[x][y] = 0;
-					x--;
+					y--;
 					grid[x][y] = temp;
 				}
-			} else if(direction == ACTION_RIGHT)	{
+			} else if(direction == ACTION_RIGHT)	{ //must be y++
 				if(boundaryCheck(x, y + 1)) {
 					direction = ACTION_DOWN;
 				} else {
@@ -319,7 +331,7 @@ public class PacmanWorld extends AbstractWorld {
 					y++;
 					grid[x][y] = temp;
 				}
-			} else if(direction == ACTION_DOWN) {
+			} else if(direction == ACTION_DOWN) { //move down must be x++
 				if(boundaryCheck(x + 1, y)) {
 					direction = ACTION_DOWN;
 				} else {
@@ -327,12 +339,12 @@ public class PacmanWorld extends AbstractWorld {
 					x++;
 					grid[x][y] = temp;
 				}
-			} else if(direction == ACTION_UP) {
-				if(boundaryCheck(x, y - 1)) {
+			} else if(direction == ACTION_UP) { // move up is x--
+				if(boundaryCheck(x - 1, y)) {
 					return move(startPos, ACTION_LEFT);
 				} else {
 					grid[x][y] = 0;
-					y--;
+					x--;
 					grid[x][y] = temp;
 				}
 			}
@@ -351,9 +363,9 @@ public class PacmanWorld extends AbstractWorld {
 	/* Start and finish methods */
 
 	/**
-	* Initialise pacman and ghost positions on the grid.
-	* @return Nothing.
-	*/
+	 * Initialise pacman and ghost positions on the grid.
+	 * @return Nothing.
+	 */
 	protected void initPos() {
 		/* Pacman in the middle */
 		pacman = new Point(8,8);
@@ -413,6 +425,8 @@ public class PacmanWorld extends AbstractWorld {
 		String s = action.toString();
 		String[] a = s.split(",");
 		int i = Integer.parseInt(a[0]);
+
+		addImage();
 
 		/* Make the move */
 		pacman = move(pacman, i);
