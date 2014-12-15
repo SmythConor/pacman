@@ -329,7 +329,7 @@ public class ConrodWorld extends AbstractWorld {
 				}
 			} else if(direction == ACTION_DOWN) { //move down must be x++
 				if(boundaryCheck(x + 1, y)) {
-					direction = ACTION_DOWN;
+					direction = ACTION_UP;
 				} else {
 					grid[x][y] = 0;
 					x++;
