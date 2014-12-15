@@ -86,7 +86,7 @@ public class PacmanWorld extends AbstractWorld {
 	protected Point greenGhost;
 
 	/* Number of steps to run */
-	protected static final int MAX_STEPS = 100;
+	protected static final int MAX_STEPS = 50;
 
 	/* Number of lives */
 	protected static final int NO_LIVES = 3;
@@ -184,7 +184,7 @@ public class PacmanWorld extends AbstractWorld {
 	* @return boolean This returns whether an object has crossed a boundary.
 	*/
 	boolean boundaryCheck(int x, int y) {
-		return grid[x][y] == 1;
+		return grid[x][y] > 0;
 	}
 
 	/**
@@ -192,7 +192,7 @@ public class PacmanWorld extends AbstractWorld {
 	* @param startPos First parameter position.
 	* @return Nothing.
 	*/
-	private void move(Point startPos, int direction) {
+	private Point move(Point startPos, int direction) {
 		int x = startPos.x;
 		int y = startPos.y;
 		int temp = grid[x][y];
@@ -206,8 +206,16 @@ public class PacmanWorld extends AbstractWorld {
 				grid[x][y] = temp;
 			}
 		} else if(direction == ACTION_RIGHT)	{
+			if(boundaryCheck(x, y + 1)) {
+				direction = ACTION_DOWN;
+			} else {
+				grid[x][y] = 0;
+				y++;
+				grid[x][y] = temp;
+			}
+		} else if(direction == ACTION_DOWN) {
 			if(boundaryCheck(x + 1, y)) {
-				direction = ACTION_UP;
+				direction = ACTION_DOWN;
 			} else {
 				grid[x][y] = 0;
 				x++;
@@ -215,23 +223,15 @@ public class PacmanWorld extends AbstractWorld {
 			}
 		} else if(direction == ACTION_UP) {
 			if(boundaryCheck(x, y - 1)) {
-				direction = ACTION_DOWN;
+				return move(startPos, ACTION_LEFT);
 			} else {
 				grid[x][y] = 0;
 				y--;
 				grid[x][y] = temp;
 			}
-		} else if(direction == ACTION_DOWN) {
-			if(boundaryCheck(x, y + 1)) {
-				move(startPos, ACTION_LEFT);
-			} else {
-				grid[x][y] = 0;
-				y++;
-				grid[x][y] = temp;
-			}
 		}
 
-		startPos = new Point(x,y);
+		return new Point(x,y);
 	}
 
 	/**
@@ -292,17 +292,17 @@ public class PacmanWorld extends AbstractWorld {
 			for(int x = 0; x < GRID_SIZE_X; x++) {
 				for(int y = 0; y < GRID_SIZE_Y; y++) {
 					Point p = new Point(x,y);
-					if(grid[x][y] == 1) {
+					if(grid[y][x] == 1) {
 						img.createGraphics().drawImage(wallImg,(imgwidth*p.x),(imgheight*p.y),null);
-					} else if(grid[x][y] == 6) {
+					} else if(grid[y][x] == 6) {
 						img.createGraphics().drawImage(pacmanImg,(imgwidth*p.x),(imgheight*p.y),null);
-					} else if(grid[x][y] == 2) {
+					} else if(grid[y][x] == 2) {
 						img.createGraphics().drawImage(redGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
-					} else if(grid[x][y] == 3) {
+					} else if(grid[y][x] == 3) {
 						img.createGraphics().drawImage(yellowGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
-					} else if(grid[x][y] == 4) {
+					} else if(grid[y][x] == 4) {
 						img.createGraphics().drawImage(blueGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
-					} else if(grid[x][y] == 5) {
+					} else if(grid[y][x] == 5) {
 						img.createGraphics().drawImage(greenGhostImg,(imgwidth*p.x),(imgheight*p.y),null);
 					}
 				}
@@ -424,10 +424,10 @@ public class PacmanWorld extends AbstractWorld {
 	* @return Nothing.
 	*/
 	private void moveGhosts() {
-		move(redGhost, randomAction());
-		move(yellowGhost, randomAction());
-		move(blueGhost, randomAction());
-		move(greenGhost, randomAction());
+		redGhost = move(redGhost, randomAction());
+		yellowGhost = move(yellowGhost, randomAction());
+		blueGhost = move(blueGhost, randomAction());
+		greenGhost = move(greenGhost, randomAction());
 	}
 
 	/**
@@ -466,24 +466,25 @@ public class PacmanWorld extends AbstractWorld {
 		int i = Integer.parseInt(a[0]);
 
 		/* Make the move */
-		move(pacman, i);
+		pacman = move(pacman, i);
 
 		/* Check to see if the ghost is caught */
 		checkCaught();
 		addImage();
 
 		/* Randomly move the ghost and check if caught */
+		//redGhost = move(redGhost, 3);
 		moveGhosts();
 		checkCaught();
 		addImage();
 
-		//moveGhosts();
-		//checkCaught();
-		//addImage();
+		moveGhosts();
+		checkCaught();
+		addImage();
 
-		//moveGhosts();
-		//checkCaught();
-		//addImage();
+		moveGhosts();
+		checkCaught();
+		addImage();
 
 		/* Move onto the next step */
 		timeStep++;
