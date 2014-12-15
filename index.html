@@ -1,0 +1,50 @@
+<html>
+
+<h1> "Alternative Pacman" World </h1>
+
+<p>Alternative Pacman is a 2-D grid where a pacman chases ghosts around a simple maze.</p>
+<p>When a ghost is caught, it resets to a random positon on the board. Score = number of ghosts caught.</p>
+
+<h1>Source code of World</h1>
+
+<a href="./ConrodWorld.java">ConrodWorld.java</a>
+
+<h1>Source code of Mind</h1>
+
+<a href="./ConrodMind.java">ConrodMind.java</a>
+
+<h1>State</h1>
+
+<p>State = "px,py,rx,ry,yx,yy,bx,by,gx,gy"</p>
+<ul>
+	<li>px = x position of pacman</li>
+	<li>py = y position of pacman</li>
+	<li>rx = x position of redGhost</li>
+	<li>ry = y position of redGhost</li>
+	<li>yx = x position of yellowGhost</li>
+	<li>yy = y position of yellowGhost</li>
+	<li>bx = x position of blueGhost</li>
+	<li>by = y position of blueGhost</li>
+	<li>gx = x position of greenGhost</li>
+	<li>gy = y position of greenGhost</li>
+</ul>
+
+<h1>Action</h1>
+
+<p>Action = "i" where i takes the values:</p>
+
+<ul>
+	<li>ConrodWorld.ACTION_LEFT</li>
+	<li>ConrodWorld.ACTION_RIGHT</li>
+	<li>ConrodWorld.ACTION_UP</li>
+	<li>ConrodWorld.ACTION_DOWN</li>
+</ul>
+
+<h1>Score</h1>
+
+<p>Score = "s1" where</p>
+<ul>
+	<li>s1 = number of times a ghost was caught</li>
+</ul>
+
+</html>
