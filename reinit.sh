@@ -1,2 +1,2 @@
-rm *.class PacmanMind.jar PacmanWorld.jar
+rm *.class ConrodMind.jar ConrodWorld.jar
 rm -rf runs/

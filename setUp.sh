@@ -1,15 +1,15 @@
-javac -cp "*" PacmanWorld.java
+javac -cp "*" ConrodWorld.java
 if [ $? -eq 0 ]; 
 then
-	jar cf0 PacmanWorld.jar PacmanWorld.class images
+	jar cf0 ConrodWorld.jar ConrodWorld.class images
 
 	if [ $? -eq 0 ];
 	then
-		javac -cp "*" PacmanMind.java
+		javac -cp "*" ConrodMind.java
 
 		if [ $? -eq 0 ];
 		then
-			jar cf0 PacmanMind.jar PacmanMind.class
+			jar cf0 ConrodMind.jar ConrodMind.class
 		fi
 	fi
 fi
