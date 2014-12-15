@@ -74,8 +74,8 @@ public class PacmanWorld extends AbstractWorld {
 	public static final int BOTTOM = GRID_SIZE - 1;
 
 	/**/
-	private int posX;
-	private int posY;
+	private int posX = 0;
+	private int posY = 0;
 
 	/* Pacman position */
 	protected Point pacman;
@@ -247,6 +247,8 @@ public class PacmanWorld extends AbstractWorld {
 			greenGhost = randomPosition();
 			grid[greenGhost.x][greenGhost.y] = GREEN_GHOST;
 		}
+
+		grid[pacman.x][pacman.y] = PACMAN;
 	}
 
 	/* General move methods */
@@ -280,6 +282,14 @@ public class PacmanWorld extends AbstractWorld {
 				x--;
 				grid[x][y] = temp;
 			} else {
+				if(posX == x && posY == y) {
+					grid[x][y] = -1;
+					direction = randomAction();
+				} else {
+					posX = x;
+					posY = y;
+				}
+
 				if(direction == ACTION_LEFT) { //move left must be y--
 					if(pacmanBoundary(x, y - 1)) {
 						direction = ACTION_RIGHT;
